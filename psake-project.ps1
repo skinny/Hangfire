@@ -26,7 +26,7 @@ Task Merge -Depends Test -Description "Run ILMerge /internalize to merge assembl
     Remove-Item ((Get-SrcOutputDir "Hangfire.SqlServer") + "\Dapper.pdb")
     
     Merge-Assembly "Hangfire.Core" @("NCrontab", "CronExpressionDescriptor", "Microsoft.Owin")
-    Merge-Assembly "Hangfire.SqlServer" @("Dapper")
+    #Merge-Assembly "Hangfire.SqlServer" @("Dapper")
 }
 
 Task Collect -Depends Merge -Description "Copy all artifacts to the build folder." {
