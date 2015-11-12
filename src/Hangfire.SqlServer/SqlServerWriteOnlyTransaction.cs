@@ -44,22 +44,26 @@ namespace Hangfire.SqlServer
 
         public override void Commit()
         {
+      
             _storage.UseTransaction(connection =>
             {
-                connection.EnlistTransaction(Transaction.Current);
+              using (var localConnection = _storage.CreateAndOpenConnection())
+              {
+                //  connection.EnlistTransaction(Transaction.Current);
 
                 if (_lockedResources.Count > 0)
                 {
-                    connection.Execute(
-                        "set nocount on;" +
-                        "exec sp_getapplock @Resource=@resource, @LockMode=N'Exclusive'",
-                        _lockedResources.Select(x => new { resource = x }));
+                  localConnection.Execute(
+                      "set nocount on;" +
+                      "exec sp_getapplock @Resource=@resource, @LockMode=N'Exclusive'",
+                      _lockedResources.Select(x => new { resource = x }));
                 }
 
                 foreach (var command in _commandQueue)
                 {
-                    command(connection);
+                  command(localConnection);
                 }
+              }
             });
         }
 
